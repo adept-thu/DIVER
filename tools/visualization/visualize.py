@@ -9,7 +9,6 @@ from PIL import Image
 
 import mmcv
 from mmcv import Config
-from mmdet import __version__ as mmdet_version
 from mmdet.datasets import build_dataset
 
 from tools.visualization.bev_render import BEVRender
@@ -23,8 +22,8 @@ plot_choices = dict(
     map = True,
     planning = True,
 )
-START = 0
-END = 81
+START = 955
+END = 956
 INTERVAL = 1
 
 
@@ -51,6 +50,21 @@ class Visualizer:
         bev_gt_path, bev_pred_path = self.bev_render.render(data, result, index)
         cam_pred_path = self.cam_render.render(data, result, index)
         self.combine(bev_gt_path, bev_pred_path, cam_pred_path, index)
+    
+    def add_vis_long(self, index):
+        data = self.dataset.get_data_info(index)
+        data1 = self.dataset.get_data_info(index + 2)
+        data2 = self.dataset.get_data_info(index + 4)
+        #import pdb;pdb.set_trace();
+        if data['gt_ego_fut_cmd'][2] == 1:
+            #import pdb;pdb.set_trace();
+            pass
+        else:
+            result = self.results[index]['img_bbox']
+            result1 = self.results[index + 2]['img_bbox']
+            result2 = self.results[index + 4]['img_bbox']
+            bev_gt_path, bev_pred_path = self.bev_render.render_long(data, data1, data2, result, result1, result2, index, type = "sparsedrive")
+            cam_pred_path = self.cam_render.render(data, result, index)
     
     def combine(self, bev_gt_path, bev_pred_path, cam_pred_path, index):
         bev_gt = cv2.imread(bev_gt_path)
@@ -99,10 +113,11 @@ def parse_args():
 def main():
     args = parse_args()
     visualizer = Visualizer(args, plot_choices)
-
+    # import pdb; pdb.set_trace()
     for idx in tqdm(range(START, END, INTERVAL)):
         if idx > len(visualizer.results):
             break
+        # visualizer.add_vis(idx)
         visualizer.add_vis(idx)
     
     visualizer.image2video()
