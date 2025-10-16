@@ -63,12 +63,12 @@ SparseDrive |0.05| 0.11| 0.23| 0.13| **0.01**| 0.05| 0.18| 0.08|
 
 - Planning results on the Turning-nuScenes validation dataset [Turning-nuScenes ](nuscenes_infos_val_hrad_planing_scene.pkl). 
 
-| Method |L2 (m) 1s  | L2 (m) 2s | L2 (m) 3s  | Col. (%) 1s | Col. (%) 2s | Col. (%) 3s | TPC (m) 1s | TPC (m) 2s | TPC (m) 3s |
-| :---: | :---:| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-|SparseDrive| 0.09| 0.18| 0.36| 0.21| 0.04| 0.17| 0.98| 0.40|
-|DiffusionDrive| 0.11| 0.21| 0.37| 0.23| **0.03**| 0.14| 0.85| 0.34|
-|MomAD |0.09| 0.17 |0.34| 0.20 |**0.03** |0.13| 0.79| 0.32|
-|**DIVER (Ours)** |**0.17**| **0.29**| **0.47**| **0.31**| **0.03**| **0.11**| **0.67**| **0.27**|
+| Method |L2 (m) 1s  | L2 (m) 2s | L2 (m) 3s  | Col. (%) 1s | Col. (%) 2s | Col. (%) 3s |
+| :---: | :---:| :---: | :---: | :---: | :---: | :---: |
+|SparseDrive| 0.09| 0.18| 0.36|  0.04| 0.17| 0.98|
+|DiffusionDrive| 0.11| 0.21| 0.37| **0.03**| 0.14| 0.85|
+|MomAD |0.09| 0.17 |0.34| **0.03** |0.13| 0.79|
+|**DIVER (Ours)** |**0.17**| **0.29**| **0.47**| **0.03**| **0.11**| **0.67**|
 
 
 ### Close-loop mertics (**weight** and **pkl**)
