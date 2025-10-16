@@ -9,7 +9,7 @@ This is the official repository of [**DIVER**](https://arxiv.org/abs/2503.03125)
 </div>
 
 <div align="center">
-  <img src="DIVER_framework.png" />
+  <img src="Vis_navsim.png" />
 </div>
 
 ## Abstract
@@ -39,7 +39,7 @@ This is the official repository of [**DIVER**](https://arxiv.org/abs/2503.03125)
 <center>
     <img style="border-radius: 0.3125em;
     box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
-    src="main.png" width="1000">
+    src="DIVER_framework.png" width="1000">
     <br>
     <div style="color:orange; border-bottom: 1px solid #d9d9d9;
     display: inline-block;
@@ -73,82 +73,58 @@ SparseDrive |0.05| 0.11| 0.23| 0.13| **0.01**| 0.05| 0.18| 0.08|
 
 ### Close-loop mertics (**weight** and **pkl**)
 
+**Table Caption:**  
+**Open-Loop**, **Closed-Loop** results and **Multi-Ability** results on **Bench2Drive** (V0.0.3) under base training set.  
+`mmt` refers to the multi-mode trajectory variant of **VAD**, and `†` denotes the re-implementation.  
+`*` denotes expert feature distillation.  
+`DS` denotes **Driving Score**.  
+`SR` denotes **Success Rate**.  
+`Effi` denotes **Efficiency**.  
+`Comf` denotes **Comfortness**.  
+`Merg.` denotes **Merging**.  
+`Overta.` denotes **Overtaking**.  
+`Emerge.` denotes **Emergency Brake**.  
+
+It is worth noting that the **_Diversity Metric_** (*Div.^(t) ↑*) is applicable only to multi-mode E2E-AD methods.
+
 - Open-loop and Closed-loop Results of E2E-AD Methods in Bench2Drive (V0.0.3)} under base training set. `mmt' denotes the extension of VAD on Multi-modal Trajectory. * denotes our re-implementation. The metircs DIVER used follows [Bench2Drive](https://github.com/Thinklab-SJTU/Bench2Drive)
 - The **weight(stage-1)**, **data pkl** and**kmenas**  of DIVER in Bench2Drive:[**DIVER**](https://pan.baidu.com/s/1qBVdpXUohfveU8au9ShAyg?pwd=u36f)
-<table border="1">
-  <thead>
-    <tr>
-      <th rowspan="2">Method</th>
-      <th colspan="1">Open-loop Metric</th>
-      <th colspan="4">Closed-loop Metric</th>
-    </tr>
-    <tr>
-      <th>Avg. L2 ↓</th>
-      <th>DS ↑</th>
-      <th>SR(%) ↑</th>
-      <th>Effi ↑</th>
-      <th>Comf ↑</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>VAD</td>
-      <td>0.91</td>
-      <td>42.35</td>
-      <td>15.00</td>
-      <td>157.94</td>
-      <td>46.01</td>
-    </tr>
-    <tr>
-      <td>VAD mmt*</td>
-      <td>0.89</td>
-      <td>42.87</td>
-      <td>15.91</td>
-      <td>158.12</td>
-      <td>47.22</td>
-    </tr>
-    <tr>
-      <td>Our DIVER (Euclidean)</td>
-      <td>0.84</td>
-      <td>46.12</td>
-      <td>17.45</td>
-      <td>173.35</td>
-      <td>50.98</td>
-    </tr>
-    <tr>
-      <td>Our DIVER</td>
-      <td>0.85</td>
-      <td>45.35</td>
-      <td>17.44</td>
-      <td>162.09</td>
-      <td>49.34</td>
-    </tr>
-    <tr>
-      <td>SparcDrive*</td>
-      <td>0.87</td>
-      <td>44.54</td>
-      <td>16.71</td>
-      <td>170.21</td>
-      <td>48.63</td>
-    </tr>
-    <tr>
-      <td>Our DIVER (Euclidean)</td>
-      <td>0.84</td>
-      <td>46.12</td>
-      <td>17.45</td>
-      <td>173.35</td>
-      <td>50.98</td>
-    </tr>
-    <tr>
-      <td>Our DIVER</td>
-      <td>0.82</td>
-      <td>47.91</td>
-      <td>18.11</td>
-      <td>174.91</td>
-      <td>51.20</td>
-    </tr>
-  </tbody>
-</table>
+
+
+---
+
+### Table: Open-Loop, Closed-Loop, and Multi-Ability results on Bench2Drive (V0.0.3)
+
+|           Method           | Traj. |  Scheme |     Venue    | Avg. L2 ↓ | Div.<sup>(t)</sup> ↑ |    DS ↑   |  SR (%) ↑ |   Effi ↑   |   Comf ↑  |   Merg.   |  Overta.  |  Emerge.  |  Give Way | Traffic Sign |    Mean   |
+| :------------------------: | :---: | :-----: | :----------: | :-------: | :------------------: | :-------: | :-------: | :--------: | :-------: | :-------: | :-------: | :-------: | :-------: | :----------: | :-------: |
+|          TCP-traj*         |   ST  |    IL   | NeurIPS 2022 |    1.70   |           -          |   59.90   |   30.00   |    76.54   |   18.08   |    8.89   |   24.29   |   51.67   |   40.00   |     46.28    |   34.22   |
+|         ThinkTwice*        |   ST  |    IL   |   CVPR 2023  |    0.95   |           -          |   62.44   |   31.23   |    69.33   |   16.22   |   27.38   |   18.42   |   35.82   |   50.00   |     54.23    |   37.17   |
+|        DriveAdapter*       |   ST  |    IL   |   ICCV 2023  |    1.01   |           -          |   64.22   |   33.08   |    70.22   |   16.01   |   28.82   |   26.38   |   48.76   |   50.00   |     56.43    |   42.08   |
+|         Raw2Drive*         |   ST  |    RL   |  Arxiv 2025  |     -     |           -          |   71.36   |   50.24   |   214.17   |   22.42   |   43.35   |   51.11   |   60.00   |   50.00   |     62.26    |   53.34   |
+|         DriveTrans*        |   MT  |    IL   |   ICLR 2025  |    0.62   |           -          |   63.46   |   35.01   |   100.64   |   20.78   |   17.57   |   35.00   |   48.36   |   40.00   |     52.10    |   38.60   |
+|            WoTE*           |   ST  |    IL   |  Arxiv 2025  |     -     |           -          |   61.71   |   31.36   |      -     |     -     |     -     |     -     |     -     |     -     |       -      |     -     |
+|           DiffAD*          |   MT  |    IL   |  Arxiv 2025  |    1.55   |           -          |   67.92   |   38.64   |      -     |     -     |     -     |     -     |     -     |     -     |       -      |     -     |
+| ThinkTwice<sub>mmt</sub>†* |   MT  |    IL   |   CVPR 2023  |    0.93   |         0.19         |   63.34   |   33.23   |    71.56   |   18.32   |   31.31   |   21.23   |   38.33   |   50.00   |     57.45    |   37.17   |
+|      **DIVER (Ours)**      |   MT  | IL & RL |       –      |  **1.11** |       **0.38**       | **68.90** | **36.75** |  **72.34** | **22.34** | **35.08** | **25.09** | **41.09** | **50.00** |   **59.21**  | **42.09** |
+|           AD-MLP           |   ST  |    IL   |  Arxiv 2023  |    3.64   |           -          |   18.05   |    0.00   |    48.45   |   22.63   |    0.00   |    0.00   |    0.00   |    0.00   |     4.35     |    0.87   |
+|         UniAD-Base         |   ST  |    IL   |   CVPR 2023  |    0.73   |           -          |   45.81   |   16.36   |   129.21   |   43.58   |   14.10   |   17.78   |   21.67   |   10.00   |     14.21    |   15.55   |
+|             VAD            |   ST  |    IL   |   ICCV 2023  |    0.91   |           -          |   42.35   |   15.00   |   157.94   |   46.01   |    8.11   |   24.44   |   18.64   |   20.00   |     19.15    |   18.07   |
+|            GenAD           |   ST  |    IL   |   ECCV 2024  |     -     |           -          |   44.81   |   15.90   |      -     |     -     |     -     |     -     |     -     |     -     |       -      |     -     |
+|         MomAD(VAD)         |   MT  |    IL   |   CVPR 2025  |    0.87   |         0.18         |   45.35   |   17.44   |   162.09   |   49.34   |    9.99   |   26.31   |   20.07   |   20.00   |     20.23    |   19.32   |
+|          MomAD(SD)         |   MT  |    IL   |   CVPR 2025  |    0.82   |         0.20         |   47.91   |   18.11   |   174.91   |   51.20   |   13.21   |   21.02   |   18.01   |   20.00   |     21.07    |   18.66   |
+|     VAD<sub>mmt</sub>†     |   MT  |    IL   |   ICCV 2023  |    0.89   |         0.20         |   42.87   |   15.91   |   158.12   |   47.22   |    9.43   |   25.31   |   19.91   |   20.00   |     20.09    |   18.95   |
+|      **DIVER (Ours)**      |   MT  | IL & RL |       –      |  **1.13** |       **0.32**       | **47.95** | **19.47** | **164.66** | **51.28** | **13.83** | **29.09** | **25.51** | **20.00** |   **24.93**  | **22.67** |
+|        SparseDrive†        |   MT  |    IL   |   ICRA 2025  |    0.87   |         0.21         |   44.54   |   16.71   |   170.21   |   48.63   |   12.18   |   23.19   |   17.91   |   20.00   |     20.98    |   17.45   |
+|      **DIVER (Ours)**      |   MT  | IL & RL |       –      |  **1.05** |       **0.35**       | **49.21** | **21.56** | **177.00** | **54.72** | **15.98** | **28.22** | **23.71** | **20.00** |   **24.38**  | **22.46** |
+
+---
+
+是否希望我再帮你：
+
+* ✅ 压缩为只保留“代表性对比方法 + DIVER (Ours)”的简表版本（如 SparseDrive / VAD / MomAD / DIVER）
+* ✅ 并格式成你上面那种仅展示关键指标（例如 Avg. L2、DS、SR、Mean）的表格？
+
+那样更适合论文中展示（尤其是 Supplementary / 简化主文表）。
 
 ### Close_loop Vis
 
