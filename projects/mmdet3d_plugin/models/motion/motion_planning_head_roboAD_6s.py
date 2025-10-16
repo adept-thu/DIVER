@@ -33,7 +33,7 @@ from ..attention import gen_sineembed_for_position
 from ..blocks import linear_relu_ln
 from ..instance_bank import topk
 from nuscenes.nuscenes import NuScenes
-from ....configs.sparsedrive_small_stage2_roboAD import batch_size
+from ....configs.MomAD_small_stage2_roboAD_6s import batch_size
 from .next_token_prediction import NextTokenPredictor
 @HEADS.register_module()
 class MotionPlanningHeadroboAD_6s(BaseModule):

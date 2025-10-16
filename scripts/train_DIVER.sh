@@ -5,8 +5,8 @@
 #    --deterministic
 
 # stage2
-CUDA_VISIBLE_DEVICES=7 bash ./tools/dist_train.sh \
+CUDA_VISIBLE_DEVICES=0,1,2,3,5,6,7 bash ./tools/dist_train.sh \
    projects/configs/DIVER_small_stage2.py \
-   1 \
+   7 \
    --deterministic
 

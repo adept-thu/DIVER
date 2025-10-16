@@ -127,6 +127,7 @@ class HierarchicalPlanningDecoder(object):
         planning_output, 
         data,
     ):
+        # import pdb;pdb.set_trace()
         classification = planning_output['classification'][-1]
         prediction = planning_output['prediction'][-1]
         bs = classification.shape[0]
@@ -276,6 +277,353 @@ class HierarchicalPlanningDecoder(object):
         score_offset = col.float() * -999
         plan_cls = plan_cls + score_offset
         return plan_cls
+
+# DriveStyle
+@BBOX_CODERS.register_module()
+class HierarchicalPlanningDecoderDiff(object):
+    def __init__(
+        self,
+        ego_fut_ts,
+        ego_fut_mode,
+        num_cmd=3,
+        use_rescore=False,
+    ):
+        super(HierarchicalPlanningDecoder, self).__init__()
+        self.ego_fut_ts = ego_fut_ts
+        self.ego_fut_mode = ego_fut_mode
+        self.num_cmd = num_cmd
+        self.use_rescore = use_rescore
+    
+    def decode(
+        self, 
+        det_output,
+        motion_output,
+        planning_output, 
+        data,
+    ):
+        classification = planning_output['diff_classification'][-1]
+        prediction = planning_output['diff_prediction'][-1]
+        bs = classification.shape[0]
+        classification = classification.reshape(bs, self.num_cmd, self.ego_fut_mode)
+        prediction = prediction.reshape(bs, self.num_cmd, self.ego_fut_mode, self.ego_fut_ts, 2).cumsum(dim=-2)
+        classification, final_planning = self.select(det_output, motion_output, classification, prediction, data)
+        anchor_queue = planning_output["anchor_queue"]
+        anchor_queue = torch.stack(anchor_queue, dim=2)
+        period = planning_output["period"]
+        output = []
+        for i, (cls, pred) in enumerate(zip(classification, prediction)):
+            output.append(
+                {
+                    "planning_score": cls.sigmoid().cpu(),
+                    "planning": pred.cpu(),
+                    "final_planning": final_planning[i].cpu(),
+                    "ego_period": period[i].cpu(),
+                    "ego_anchor_queue": decode_box(anchor_queue[i]).cpu(),
+                }
+            )
+
+        return output
+
+    def select(
+        self,
+        det_output,
+        motion_output,
+        plan_cls,
+        plan_reg,
+        data,
+    ):
+        det_classification = det_output["classification"][-1].sigmoid()
+        det_anchors = det_output["prediction"][-1]
+        det_confidence = det_classification.max(dim=-1).values
+        motion_cls = motion_output["classification"][-1].sigmoid()
+        motion_reg = motion_output["prediction"][-1]
+        
+        # cmd select
+        bs = motion_cls.shape[0]
+        bs_indices = torch.arange(bs, device=motion_cls.device)
+        cmd = data['gt_ego_fut_cmd'].argmax(dim=-1)
+        plan_cls_full = plan_cls.detach().clone()
+        plan_cls = plan_cls[bs_indices, cmd]
+        plan_reg = plan_reg[bs_indices, cmd]
+
+        # rescore
+        if self.use_rescore:
+            plan_cls = self.rescore(
+                plan_cls,
+                plan_reg, 
+                motion_cls,
+                motion_reg, 
+                det_anchors,
+                det_confidence,
+            )
+        plan_cls_full[bs_indices, cmd] = plan_cls
+        mode_idx = plan_cls.argmax(dim=-1)
+        final_planning = plan_reg[bs_indices, mode_idx]
+        return plan_cls_full, final_planning
+
+    def rescore(
+        self, 
+        plan_cls,
+        plan_reg, 
+        motion_cls,
+        motion_reg, 
+        det_anchors,
+        det_confidence,
+        score_thresh=0.5,
+        static_dis_thresh=0.5,
+        dim_scale=1.1,
+        num_motion_mode=1,
+        offset=0.5,
+    ):
+        
+        def cat_with_zero(traj):
+            zeros = traj.new_zeros(traj.shape[:-2] + (1, 2))
+            traj_cat = torch.cat([zeros, traj], dim=-2)
+            return traj_cat
+        
+        def get_yaw(traj, start_yaw=np.pi/2):
+            yaw = traj.new_zeros(traj.shape[:-1])
+            yaw[..., 1:-1] = torch.atan2(
+                traj[..., 2:, 1] - traj[..., :-2, 1],
+                traj[..., 2:, 0] - traj[..., :-2, 0],
+            )
+            yaw[..., -1] = torch.atan2(
+                traj[..., -1, 1] - traj[..., -2, 1],
+                traj[..., -1, 0] - traj[..., -2, 0],
+            )
+            yaw[..., 0] = start_yaw
+            # for static object, estimated future yaw would be unstable
+            start = traj[..., 0, :]
+            end = traj[..., -1, :]
+            dist = torch.linalg.norm(end - start, dim=-1)
+            mask = dist < static_dis_thresh
+            start_yaw = yaw[..., 0].unsqueeze(-1)
+            yaw = torch.where(
+                mask.unsqueeze(-1),
+                start_yaw,
+                yaw,
+            )
+            return yaw.unsqueeze(-1)
+        
+        ## ego
+        bs = plan_reg.shape[0]
+        plan_reg_cat = cat_with_zero(plan_reg)
+        ego_box = det_anchors.new_zeros(bs, self.ego_fut_mode, self.ego_fut_ts + 1, 7)
+        ego_box[..., [X, Y]] = plan_reg_cat
+        ego_box[..., [W, L, H]] = ego_box.new_tensor([4.08, 1.73, 1.56]) * dim_scale
+        ego_box[..., [YAW]] = get_yaw(plan_reg_cat)
+
+        ## motion
+        motion_reg = motion_reg[..., :self.ego_fut_ts, :].cumsum(-2)
+        motion_reg = cat_with_zero(motion_reg) + det_anchors[:, :, None, None, :2]
+        _, motion_mode_idx = torch.topk(motion_cls, num_motion_mode, dim=-1)
+        motion_mode_idx = motion_mode_idx[..., None, None].repeat(1, 1, 1, self.ego_fut_ts + 1, 2)
+        motion_reg = torch.gather(motion_reg, 2, motion_mode_idx)
+
+        motion_box = motion_reg.new_zeros(motion_reg.shape[:-1] + (7,))
+        motion_box[..., [X, Y]] = motion_reg
+        motion_box[..., [W, L, H]] = det_anchors[..., None, None, [W, L, H]].exp()
+        box_yaw = torch.atan2(
+            det_anchors[..., SIN_YAW],
+            det_anchors[..., COS_YAW],
+        )
+        motion_box[..., [YAW]] = get_yaw(motion_reg, box_yaw.unsqueeze(-1))
+
+        filter_mask = det_confidence < score_thresh
+        motion_box[filter_mask] = 1e6
+
+        ego_box = ego_box[..., 1:, :]
+        motion_box = motion_box[..., 1:, :]
+
+        bs, num_ego_mode, ts, _ = ego_box.shape
+        bs, num_anchor, num_motion_mode, ts, _ = motion_box.shape
+        ego_box = ego_box[:, None, None].repeat(1, num_anchor, num_motion_mode, 1, 1, 1).flatten(0, -2)
+        motion_box = motion_box.unsqueeze(3).repeat(1, 1, 1, num_ego_mode, 1, 1).flatten(0, -2)
+
+        ego_box[0] += offset * torch.cos(ego_box[6])
+        ego_box[1] += offset * torch.sin(ego_box[6])
+        col = check_collision(ego_box, motion_box)
+        col = col.reshape(bs, num_anchor, num_motion_mode, num_ego_mode, ts).permute(0, 3, 1, 2, 4)
+        col = col.flatten(2, -1).any(dim=-1)
+        all_col = col.all(dim=-1)
+        col[all_col] = False # for case that all modes collide, no need to rescore
+        score_offset = col.float() * -999
+        plan_cls = plan_cls + score_offset
+        return plan_cls
+
+# MomAD
+@BBOX_CODERS.register_module()
+class HierarchicalPlanningDecoderMomAD(object):
+    def __init__(
+        self,
+        ego_fut_ts,
+        ego_fut_mode,
+        num_cmd=3,
+        use_rescore=False,
+    ):
+        super(HierarchicalPlanningDecoder, self).__init__()
+        self.ego_fut_ts = ego_fut_ts
+        self.ego_fut_mode = ego_fut_mode
+        self.num_cmd = num_cmd
+        self.use_rescore = use_rescore
+    
+    def decode(
+        self, 
+        det_output,
+        motion_output,
+        planning_output, 
+        data,
+    ):
+        classification = planning_output['classification_refined'][-1]
+        prediction = planning_output['prediction_refined'][-1]
+        bs = classification.shape[0]
+        classification = classification.reshape(bs, self.num_cmd, self.ego_fut_mode)
+        prediction = prediction.reshape(bs, self.num_cmd, self.ego_fut_mode, self.ego_fut_ts, 2).cumsum(dim=-2)
+        classification, final_planning = self.select(det_output, motion_output, classification, prediction, data)
+        anchor_queue = planning_output["anchor_queue"]
+        anchor_queue = torch.stack(anchor_queue, dim=2)
+        period = planning_output["period"]
+        output = []
+        for i, (cls, pred) in enumerate(zip(classification, prediction)):
+            output.append(
+                {
+                    "planning_score": cls.sigmoid().cpu(),
+                    "planning": pred.cpu(),
+                    "final_planning": final_planning[i].cpu(),
+                    "ego_period": period[i].cpu(),
+                    "ego_anchor_queue": decode_box(anchor_queue[i]).cpu(),
+                }
+            )
+
+        return output
+
+    def select(
+        self,
+        det_output,
+        motion_output,
+        plan_cls,
+        plan_reg,
+        data,
+    ):
+        det_classification = det_output["classification"][-1].sigmoid()
+        det_anchors = det_output["prediction"][-1]
+        det_confidence = det_classification.max(dim=-1).values
+        motion_cls = motion_output["classification"][-1].sigmoid()
+        motion_reg = motion_output["prediction"][-1]
+        
+        # cmd select
+        bs = motion_cls.shape[0]
+        bs_indices = torch.arange(bs, device=motion_cls.device)
+        cmd = data['gt_ego_fut_cmd'].argmax(dim=-1)
+        plan_cls_full = plan_cls.detach().clone()
+        plan_cls = plan_cls[bs_indices, cmd]
+        plan_reg = plan_reg[bs_indices, cmd]
+
+        # rescore
+        if self.use_rescore:
+            plan_cls = self.rescore(
+                plan_cls,
+                plan_reg, 
+                motion_cls,
+                motion_reg, 
+                det_anchors,
+                det_confidence,
+            )
+        plan_cls_full[bs_indices, cmd] = plan_cls
+        mode_idx = plan_cls.argmax(dim=-1)
+        final_planning = plan_reg[bs_indices, mode_idx]
+        return plan_cls_full, final_planning
+
+    def rescore(
+        self, 
+        plan_cls,
+        plan_reg, 
+        motion_cls,
+        motion_reg, 
+        det_anchors,
+        det_confidence,
+        score_thresh=0.5,
+        static_dis_thresh=0.5,
+        dim_scale=1.1,
+        num_motion_mode=1,
+        offset=0.5,
+    ):
+        
+        def cat_with_zero(traj):
+            zeros = traj.new_zeros(traj.shape[:-2] + (1, 2))
+            traj_cat = torch.cat([zeros, traj], dim=-2)
+            return traj_cat
+        
+        def get_yaw(traj, start_yaw=np.pi/2):
+            yaw = traj.new_zeros(traj.shape[:-1])
+            yaw[..., 1:-1] = torch.atan2(
+                traj[..., 2:, 1] - traj[..., :-2, 1],
+                traj[..., 2:, 0] - traj[..., :-2, 0],
+            )
+            yaw[..., -1] = torch.atan2(
+                traj[..., -1, 1] - traj[..., -2, 1],
+                traj[..., -1, 0] - traj[..., -2, 0],
+            )
+            yaw[..., 0] = start_yaw
+            # for static object, estimated future yaw would be unstable
+            start = traj[..., 0, :]
+            end = traj[..., -1, :]
+            dist = torch.linalg.norm(end - start, dim=-1)
+            mask = dist < static_dis_thresh
+            start_yaw = yaw[..., 0].unsqueeze(-1)
+            yaw = torch.where(
+                mask.unsqueeze(-1),
+                start_yaw,
+                yaw,
+            )
+            return yaw.unsqueeze(-1)
+        
+        ## ego
+        bs = plan_reg.shape[0]
+        plan_reg_cat = cat_with_zero(plan_reg)
+        ego_box = det_anchors.new_zeros(bs, self.ego_fut_mode, self.ego_fut_ts + 1, 7)
+        ego_box[..., [X, Y]] = plan_reg_cat
+        ego_box[..., [W, L, H]] = ego_box.new_tensor([4.08, 1.73, 1.56]) * dim_scale
+        ego_box[..., [YAW]] = get_yaw(plan_reg_cat)
+
+        ## motion
+        motion_reg = motion_reg[..., :self.ego_fut_ts, :].cumsum(-2)
+        motion_reg = cat_with_zero(motion_reg) + det_anchors[:, :, None, None, :2]
+        _, motion_mode_idx = torch.topk(motion_cls, num_motion_mode, dim=-1)
+        motion_mode_idx = motion_mode_idx[..., None, None].repeat(1, 1, 1, self.ego_fut_ts + 1, 2)
+        motion_reg = torch.gather(motion_reg, 2, motion_mode_idx)
+
+        motion_box = motion_reg.new_zeros(motion_reg.shape[:-1] + (7,))
+        motion_box[..., [X, Y]] = motion_reg
+        motion_box[..., [W, L, H]] = det_anchors[..., None, None, [W, L, H]].exp()
+        box_yaw = torch.atan2(
+            det_anchors[..., SIN_YAW],
+            det_anchors[..., COS_YAW],
+        )
+        motion_box[..., [YAW]] = get_yaw(motion_reg, box_yaw.unsqueeze(-1))
+
+        filter_mask = det_confidence < score_thresh
+        motion_box[filter_mask] = 1e6
+
+        ego_box = ego_box[..., 1:, :]
+        motion_box = motion_box[..., 1:, :]
+
+        bs, num_ego_mode, ts, _ = ego_box.shape
+        bs, num_anchor, num_motion_mode, ts, _ = motion_box.shape
+        ego_box = ego_box[:, None, None].repeat(1, num_anchor, num_motion_mode, 1, 1, 1).flatten(0, -2)
+        motion_box = motion_box.unsqueeze(3).repeat(1, 1, 1, num_ego_mode, 1, 1).flatten(0, -2)
+
+        ego_box[0] += offset * torch.cos(ego_box[6])
+        ego_box[1] += offset * torch.sin(ego_box[6])
+        col = check_collision(ego_box, motion_box)
+        col = col.reshape(bs, num_anchor, num_motion_mode, num_ego_mode, ts).permute(0, 3, 1, 2, 4)
+        col = col.flatten(2, -1).any(dim=-1)
+        all_col = col.all(dim=-1)
+        col[all_col] = False # for case that all modes collide, no need to rescore
+        score_offset = col.float() * -999
+        plan_cls = plan_cls + score_offset
+        return plan_cls
+
 
 
 def check_collision(boxes1, boxes2):

@@ -29,9 +29,10 @@ from ..attention import gen_sineembed_for_position
 from ..blocks import linear_relu_ln
 from ..instance_bank import topk
 
+from .worldmodelgraph import WorldModelGraph
 
 @HEADS.register_module()
-class MotionPlanningHead(BaseModule):
+class MotionPlanningHead_PlanWorld(BaseModule):
     def __init__(
         self,
         fut_ts=12,
@@ -61,8 +62,9 @@ class MotionPlanningHead(BaseModule):
         planning_decoder=None,
         num_det=50,
         num_map=10,
+        k=8
     ):
-        super(MotionPlanningHead, self).__init__()
+        super(MotionPlanningHead_PlanWorld, self).__init__()
         self.fut_ts = fut_ts
         self.fut_mode = fut_mode
         self.ego_fut_ts = ego_fut_ts
@@ -139,6 +141,10 @@ class MotionPlanningHead(BaseModule):
 
         self.num_det = num_det
         self.num_map = num_map
+        
+        self.k=k
+        self.world_model = WorldModelGraph(embed_dims)
+        self.graph_proj = nn.Linear(embed_dims, embed_dims)
 
     def init_weights(self):
         for i, op in enumerate(self.operation_order):
@@ -313,7 +319,26 @@ class MotionPlanningHead(BaseModule):
                 )
             elif op == "refine":
                 motion_query = motion_mode_query + (instance_feature + anchor_embed)[:, :num_anchor].unsqueeze(2)
-                plan_query = plan_mode_query + (instance_feature + anchor_embed)[:, num_anchor:].unsqueeze(2)
+                #det_output["prediction"][0][:,:,:2] [2,900,2]
+                close_ids = (torch.norm(det_output["prediction"][0][:,:,:2], dim=-1)[0] < 10).nonzero().squeeze(1)
+                print(close_ids)
+                print(det_output["prediction"][0][:,:,:2].shape)
+                import pdb;pdb.set_trace()
+                # Step 1: 构建稀疏邻接（K近邻）
+                with torch.no_grad():
+                    dist = torch.cdist(instance_feature, instance_feature)
+                    _, neighbor_idx = dist.topk(k=self.k, largest=False)
+
+                # Step 2: 图世界建模
+                world_state = self.world_model(instance_feature, neighbor_idx)
+                # Step 3: 融合生成 plan_query
+                plan_query = plan_mode_query + (
+                    instance_feature[:, num_anchor:] +
+                    anchor_embed[:, num_anchor:] +
+                    self.graph_proj(world_state[:, num_anchor:])
+                ).unsqueeze(2)
+                
+                # plan_query = plan_mode_query + (instance_feature + anchor_embed)[:, num_anchor:].unsqueeze(2)
 
                 (
                     motion_cls,
