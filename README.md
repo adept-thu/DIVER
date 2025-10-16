@@ -58,17 +58,17 @@ This is the official repository of [**DIVER**](https://arxiv.org/abs/2503.03125)
 | Method |  L2 (m) 1s  | L2 (m) 2s | L2 (m) 3s | L2 (m) Avg | Col. (%) 1s | Col. (%) 2s | Col. (%) 3s | Col. (%) Avg | 
 | :---: | :---:| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | UniAD | 0.07| 0.14| 0.24| 0.15 |0.03| 0.05| 0.16| 0.08 |
-SparseDrive |0.05| 0.11| 0.23| 0.13| 0.01| 0.05| 0.18| 0.08|
-**DIVER (Ours)**   | 0.10| 0.19| 0.34| 0.21| 0.01| 0.05| 0.15| 0.07|
+SparseDrive |0.05| 0.11| 0.23| 0.13| **0.01**| 0.05| 0.18| 0.08|
+**DIVER (Ours)**   | **0.10**| **0.19**| **0.34**| **0.21**| **0.01**| **0.05**| **0.15**| **0.07**|
 
-- Planning results on the Turning-nuScenes validation dataset [Turning-nuScenes ](/open_loop/nuscenes_infos_val_hrad_planing_scene.pkl).  We train 10 epochs on 6s trajectories and test on 6s trajectories.
+- Planning results on the Turning-nuScenes validation dataset [Turning-nuScenes ](nuscenes_infos_val_hrad_planing_scene.pkl). 
 
 | Method |L2 (m) 1s  | L2 (m) 2s | L2 (m) 3s  | Col. (%) 1s | Col. (%) 2s | Col. (%) 3s | TPC (m) 1s | TPC (m) 2s | TPC (m) 3s |
 | :---: | :---:| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-SparseDrive 0.09 0.18 0.36 0.21 0.04 0.17 0.98 0.40
-DiffusionDrive 0.11 0.21 0.37 0.23 0.03 0.14 0.85 0.34
-MomAD 0.09 0.17 0.34 0.20 0.03 0.13 0.79 0.32
-**DIVER (Ours)** 0.17 0.29 0.47 0.31 0.03 0.11 0.67 0.27
+|SparseDrive| 0.09| 0.18| 0.36| 0.21| 0.04| 0.17| 0.98| 0.40|
+|DiffusionDrive| 0.11| 0.21| 0.37| 0.23| **0.03**| 0.14| 0.85| 0.34|
+|MomAD |0.09| 0.17 |0.34| 0.20 |**0.03** |0.13| 0.79| 0.32|
+|**DIVER (Ours)** |**0.17**| **0.29**| **0.47**| **0.31**| **0.03**| **0.11**| **0.67**| **0.27**|
 
 
 ### Close-loop mertics (**weight** and **pkl**)
