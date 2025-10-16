@@ -9,7 +9,7 @@ This is the official repository of [**DIVER**](https://arxiv.org/abs/2503.03125)
 </div>
 
 <div align="center">
-  <img src="open_loop/vis_5(3).png" />
+  <img src="DIVER_framework.png" />
 </div>
 
 ## Abstract
