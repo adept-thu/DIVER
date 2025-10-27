@@ -1,5 +1,10 @@
 # Quick Start
 
+### downlop DIVER code for NuScenes
+```bash
+git clone -b nusc --single-branch https://github.com/adept-thu/DIVER.git
+```
+
 ### Set up a new virtual environment
 ```bash
 conda create -n diver_nus_env python=3.8 -y
