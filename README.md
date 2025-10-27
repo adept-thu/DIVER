@@ -53,7 +53,6 @@ This is the official repository of [**DIVER**](https://arxiv.org/abs/2503.03125)
 ### Open-loop mertics
 
 - Planning results on [nuScenes](https://github.com/nutonomy/nuscenes-devkit).
-- DIVER 3s stage2: [ckpt](https://huggingface.co/ZI-YING/DIVER_nuScenes_stage2_planing_3s)
 
 | Method |  L2 (m) 1s  | L2 (m) 2s | L2 (m) 3s | L2 (m) Avg | Col. (%) 1s | Col. (%) 2s | Col. (%) 3s | Col. (%) Avg | 
 | :---: | :---:| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -61,7 +60,7 @@ This is the official repository of [**DIVER**](https://arxiv.org/abs/2503.03125)
 SparseDrive |0.05| 0.11| 0.23| 0.13| **0.01**| 0.05| 0.18| 0.08|
 **DIVER (Ours)**   | **0.10**| **0.19**| **0.34**| **0.21**| **0.01**| **0.05**| **0.15**| **0.07**|
 
-- Planning results on the Turning-nuScenes validation dataset [Turning-nuScenes ](nuscenes_infos_val_hrad_planing_scene.pkl). 
+- Planning results on the Turning-nuScenes validation dataset [Turning-nuScenes ](https://github.com/adept-thu/MomAD/blob/main/open_loop/nuscenes_infos_val_hrad_planing_scene.pkl). 
 
 | Method |L2 (m) 1s  | L2 (m) 2s | L2 (m) 3s  | Col. (%) 1s | Col. (%) 2s | Col. (%) 3s |
 | :---: | :---:| :---: | :---: | :---: | :---: | :---: |
@@ -70,30 +69,9 @@ SparseDrive |0.05| 0.11| 0.23| 0.13| **0.01**| 0.05| 0.18| 0.08|
 |MomAD |0.09| 0.17 |0.34| **0.03** |0.13| 0.79|
 |**DIVER (Ours)** |**0.17**| **0.29**| **0.47**| **0.03**| **0.11**| **0.67**|
 
-
-### Close-loop mertics (**weight** and **pkl**)
-
-**Table Caption:**  
-**Open-Loop**, **Closed-Loop** results and **Multi-Ability** results on **Bench2Drive** (V0.0.3) under base training set.  
-`mmt` refers to the multi-mode trajectory variant of **VAD**, and `†` denotes the re-implementation.  
-`*` denotes expert feature distillation.  
-`DS` denotes **Driving Score**.  
-`SR` denotes **Success Rate**.  
-`Effi` denotes **Efficiency**.  
-`Comf` denotes **Comfortness**.  
-`Merg.` denotes **Merging**.  
-`Overta.` denotes **Overtaking**.  
-`Emerge.` denotes **Emergency Brake**.  
-
-It is worth noting that the **_Diversity Metric_** (*Div.^(t) ↑*) is applicable only to multi-mode E2E-AD methods.
-
-- Open-loop and Closed-loop Results of E2E-AD Methods in Bench2Drive (V0.0.3)} under base training set. `mmt' denotes the extension of VAD on Multi-modal Trajectory. * denotes our re-implementation. The metircs DIVER used follows [Bench2Drive](https://github.com/Thinklab-SJTU/Bench2Drive)
-- The **weight(stage-1)**, **data pkl** and**kmenas**  of DIVER in Bench2Drive:[**DIVER**](https://pan.baidu.com/s/1qBVdpXUohfveU8au9ShAyg?pwd=u36f)
+- Planning results on the Bench2Drive dataset [Bench2Drive](https://github.com/Thinklab-SJTU/Bench2Drive). 
 
 
----
-
-### Table: Open-Loop, Closed-Loop, and Multi-Ability results on Bench2Drive (V0.0.3)
 
 |           Method           | Traj. |  Scheme |     Venue    | Avg. L2 ↓ | Div.<sup>(t)</sup> ↑ |    DS ↑   |  SR (%) ↑ |   Effi ↑   |   Comf ↑  |   Merg.   |  Overta.  |  Emerge.  |  Give Way | Traffic Sign |    Mean   |
 | :------------------------: | :---: | :-----: | :----------: | :-------: | :------------------: | :-------: | :-------: | :--------: | :-------: | :-------: | :-------: | :-------: | :-------: | :----------: | :-------: |
@@ -106,176 +84,26 @@ It is worth noting that the **_Diversity Metric_** (*Div.^(t) ↑*) is applicabl
 |        SparseDrive†        |   MT  |    IL   |   ICRA 2025  |    0.87   |         0.21         |   44.54   |   16.71   |   170.21   |   48.63   |   12.18   |   23.19   |   17.91   |   20.00   |     20.98    |   17.45   |
 |      **DIVER (Ours)**      |   MT  | IL & RL |       –      |  **1.05** |       **0.35**       | **49.21** | **21.56** | **177.00** | **54.72** | **15.98** | **28.22** | **23.71** | **20.00** |   **24.38**  | **22.46** |
 
----
-
-是否希望我再帮你：
-
-* ✅ 压缩为只保留“代表性对比方法 + DIVER (Ours)”的简表版本（如 SparseDrive / VAD / MomAD / DIVER）
-* ✅ 并格式成你上面那种仅展示关键指标（例如 Avg. L2、DS、SR、Mean）的表格？
-
-那样更适合论文中展示（尤其是 Supplementary / 简化主文表）。
-
-### Close_loop Vis
-
-<p align="left">
-  <img src = "./close_loop/video_show.gif" width="60%">
-</p>
-
-### Robustness evaluation
-
-- Robustness analysis on [nuScenes-C](https://github.com/thu-ml/3D_Corruptions_AD)
-
-<table border="1">
-  <thead>
-    <tr>
-      <th rowspan="2">Setting</th>
-      <th rowspan="2">Method</th>
-      <th colspan="2">Detection</th>
-      <th colspan="1">Tracking</th>
-      <th colspan="1">Mapping</th>
-      <th colspan="1">Motion</th>
-      <th colspan="3">Planning</th>
-    </tr>
-    <tr>
-      <th>mAP ↑</th>
-      <th>NDS ↑</th>
-      <th>AMOTA ↑</th>
-      <th>mAP ↑</th>
-      <th>mADE ↓</th>
-      <th>L2 ↓</th>
-      <th>Col. ↓</th>
-      <th>TPC ↓</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Clean</td>
-      <td>SparseDrive</td>
-      <td>0.418</td>
-      <td>0.525</td>
-      <td>0.386</td>
-      <td>55.1</td>
-      <td>0.62</td>
-      <td>0.61</td>
-      <td>0.08</td>
-      <td>0.57</td>
-    </tr>
-    <tr>
-      <td>Clean</td>
-      <td>Our DIVER</td>
-      <td>0.423</td>
-      <td>0.531</td>
-      <td>0.391</td>
-      <td>55.9</td>
-      <td>0.61</td>
-      <td>0.60</td>
-      <td>0.09</td>
-      <td>0.54</td>
-    </tr>
-    <tr>
-      <td>Snow</td>
-      <td>SparseDrive</td>
-      <td>0.091</td>
-      <td>0.111</td>
-      <td>0.102</td>
-      <td>16.0</td>
-      <td>0.98</td>
-      <td>0.88</td>
-      <td>0.32</td>
-      <td>0.82</td>
-    </tr>
-    <tr>
-      <td>Snow</td>
-      <td>Our DIVER</td>
-      <td>0.154</td>
-      <td>0.173</td>
-      <td>0.166</td>
-      <td>20.9</td>
-      <td>0.76</td>
-      <td>0.73</td>
-      <td>0.16</td>
-      <td>0.68</td>
-    </tr>
-    <tr>
-      <td>Fog</td>
-      <td>SparseDrive</td>
-      <td>0.141</td>
-      <td>0.159</td>
-      <td>0.154</td>
-      <td>18.8</td>
-      <td>0.91</td>
-      <td>0.86</td>
-      <td>0.41</td>
-      <td>0.80</td>
-    </tr>
-    <tr>
-      <td>Fog</td>
-      <td>Our DIVER</td>
-      <td>0.197</td>
-      <td>0.197</td>
-      <td>0.206</td>
-      <td>24.9</td>
-      <td>0.73</td>
-      <td>0.71</td>
-      <td>0.18</td>
-      <td>0.67</td>
-    </tr>
-    <tr>
-      <td>Rain</td>
-      <td>SparseDrive</td>
-      <td>0.128</td>
-      <td>0.140</td>
-      <td>0.193</td>
-      <td>19.4</td>
-      <td>0.97</td>
-      <td>0.93</td>
-      <td>0.46</td>
-      <td>0.92</td>
-    </tr>
-    <tr>
-      <td>Rain</td>
-      <td>Our DIVER</td>
-      <td>0.207</td>
-      <td>0.213</td>
-      <td>0.266</td>
-      <td>25.2</td>
-      <td>0.76</td>
-      <td>0.71</td>
-      <td>0.21</td>
-      <td>0.71</td>
-    </tr>
-  </tbody>
-</table>
 
 
-## Trajectory Prediction Consistency (TPC) metric
-To evaluate the planning stability of DIVER, we propose a new [Trajectory Prediction Consistency (TPC) metric](/open_loop/projects/mmdet3d_plugin/datasets/evaluation/planning/planning_eval_roboAD_6s.py) to measure consistency between predicted and historical trajectories.
 
-## How to generate a 6s nuScenes trajectory dataset？
-```
-python tools/data_converter/nuscenes_converter_6s.py nuscenes \
-    --root-path ./data/nuscenes \
-    --canbus ./data/nuscenes \
-    --out-dir ./data/infos/ \
-    --extra-tag nuscenes \
-    --version v1.0
+
+
+
 ```
 ## Quick Start
-[Quick Start for Open_loop](open_loop/docs/quick_start.md)
+[Quick Start for Open_loop](docs/nus_quick_start.md)
 
-[Quick start for Close_loop](close_loop/quick_start.md)
+[Quick start for Close_loop](close_loop/b2d_quick_start.md)
 
 ## Citation
 If you find DIVER is useful in your research or applications, please consider giving us a star 🌟 and citing it by the following BibTeX entry.
 ```
-@article{song2025DIVER,
-      title={Don't Shake the Wheel: Momentum-Aware Planning in End-to-End Autonomous Driving}, 
-      author={Ziying Song and Caiyan Jia and Lin Liu and Hongyu Pan and Yongchang Zhang and Junming Wang and Xingyu Zhang and Shaoqing Xu and Lei Yang and Yadan Luo},
-      year={2025},
-      eprint={2503.03125},
-      archivePrefix={arXiv},
-      primaryClass={cs.RO},
-      url={https://arxiv.org/abs/2503.03125}, 
+@article{song2025breaking,
+  title={Breaking imitation bottlenecks: Reinforced diffusion powers diverse trajectory generation},
+  author={Song, Ziying and Liu, Lin and Pan, Hongyu and Liao, Bencheng and Guo, Mingzhe and Yang, Lei and Zhang, Yongchang and Xu, Shaoqing and Jia, Caiyan and Luo, Yadan},
+  journal={arXiv preprint arXiv:2507.04049},
+  year={2025}
 }
 ```
 ## Acknowledgement
@@ -283,4 +111,7 @@ If you find DIVER is useful in your research or applications, please consider gi
 - [UniAD](https://github.com/OpenDriveLab/UniAD) 
 - [VAD](https://github.com/hustvl/VAD)
 - [mmdet3d](https://github.com/open-mmlab/mmdetection3d)
+- [MomAD](https://github.com/adept-thu/MomAD)
+- [DiffusionDrive](https://github.com/hustvl/DiffusionDrive)
+
 
