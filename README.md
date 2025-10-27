@@ -16,10 +16,10 @@ This is the official repository of [**DIVER**](https://arxiv.org/abs/2503.03125)
 <div align="justify">
   Existing end-to-end autonomous driving (E2E-AD) methods predominantly rely on single expert demonstrations through imitation learning, often leading to conservative and homogeneous driving behaviors that struggle to generalize to complex real-world scenarios. In this work, we propose DIVER, a novel E2E-AD framework that combines diffusion-based multi-mode trajectory generation with reinforcement learning to produce diverse, safe, and goal-directed trajectories. First, the model conditions on map elements and surrounding agents to generate multiple reference trajectories from each ground-truth reference trajectory that overcome the inherent limitations of single-mode imitation. Second, we treat the diffusion process as a stochastic policy and employ Group Relative Policy Optimization (GPRO) objectives to guide the diffusion process. By optimizing trajectory-level rewards for both diversity and safety, GRPO directly mitigates mode collapse and enhances collision avoidance, encouraging exploration beyond expert demonstrations and ensuring physically plausible plans. Furthermore, to address the limitations of L2-based open-loop metrics in capturing trajectory diversity, we propose a novel trajectory diversity metric to evaluate the diversity of multi-mode predictions. Extensive experiments on the closed-loop NAVSIM and Bench2Drive benchmarks, as well as the open-loop nuScenes dataset, demonstrate that DIVER significantly improves trajectory diversity, effectively addressing the mode collapse problem inherent in imitation learning.
 </div>
+
+
+
 <div align="justify">
-
-
-
 :fire: Contributions:
 * **DIVER Concept.**  We propose the DIVER, an novel multi-mode E2E-AD framework that uses reinforcement learning to guide diffusion models in generating diverse and feasible driving behaviors.
 
@@ -30,7 +30,7 @@ This is the official repository of [**DIVER**](https://arxiv.org/abs/2503.03125)
 * **Diversity Metric.** We propose a novel Diversity Metric to evaluate multi-mode trajectory generation, providing a more principled way to assess the diversity and effectiveness of generated trajectories compared to existing metrics.
 
 * **Performance Evaluation.** Extensive evaluations on the Bench2Drive, NAVSIM, NuScenes demonstrate that DIVER significantly improves the diversity, safety, and feasibility of generated trajectories over state-of-the-art methods.
-* </div>
+ </div>
 
 
 
@@ -97,15 +97,7 @@ It is worth noting that the **_Diversity Metric_** (*Div.^(t) ↑*) is applicabl
 
 |           Method           | Traj. |  Scheme |     Venue    | Avg. L2 ↓ | Div.<sup>(t)</sup> ↑ |    DS ↑   |  SR (%) ↑ |   Effi ↑   |   Comf ↑  |   Merg.   |  Overta.  |  Emerge.  |  Give Way | Traffic Sign |    Mean   |
 | :------------------------: | :---: | :-----: | :----------: | :-------: | :------------------: | :-------: | :-------: | :--------: | :-------: | :-------: | :-------: | :-------: | :-------: | :----------: | :-------: |
-|          TCP-traj*         |   ST  |    IL   | NeurIPS 2022 |    1.70   |           -          |   59.90   |   30.00   |    76.54   |   18.08   |    8.89   |   24.29   |   51.67   |   40.00   |     46.28    |   34.22   |
-|         ThinkTwice*        |   ST  |    IL   |   CVPR 2023  |    0.95   |           -          |   62.44   |   31.23   |    69.33   |   16.22   |   27.38   |   18.42   |   35.82   |   50.00   |     54.23    |   37.17   |
-|        DriveAdapter*       |   ST  |    IL   |   ICCV 2023  |    1.01   |           -          |   64.22   |   33.08   |    70.22   |   16.01   |   28.82   |   26.38   |   48.76   |   50.00   |     56.43    |   42.08   |
-|         Raw2Drive*         |   ST  |    RL   |  Arxiv 2025  |     -     |           -          |   71.36   |   50.24   |   214.17   |   22.42   |   43.35   |   51.11   |   60.00   |   50.00   |     62.26    |   53.34   |
-|         DriveTrans*        |   MT  |    IL   |   ICLR 2025  |    0.62   |           -          |   63.46   |   35.01   |   100.64   |   20.78   |   17.57   |   35.00   |   48.36   |   40.00   |     52.10    |   38.60   |
-|            WoTE*           |   ST  |    IL   |  Arxiv 2025  |     -     |           -          |   61.71   |   31.36   |      -     |     -     |     -     |     -     |     -     |     -     |       -      |     -     |
-|           DiffAD*          |   MT  |    IL   |  Arxiv 2025  |    1.55   |           -          |   67.92   |   38.64   |      -     |     -     |     -     |     -     |     -     |     -     |       -      |     -     |
-| ThinkTwice<sub>mmt</sub>†* |   MT  |    IL   |   CVPR 2023  |    0.93   |         0.19         |   63.34   |   33.23   |    71.56   |   18.32   |   31.31   |   21.23   |   38.33   |   50.00   |     57.45    |   37.17   |
-|      **DIVER (Ours)**      |   MT  | IL & RL |       –      |  **1.11** |       **0.38**       | **68.90** | **36.75** |  **72.34** | **22.34** | **35.08** | **25.09** | **41.09** | **50.00** |   **59.21**  | **42.09** |
+
 |           AD-MLP           |   ST  |    IL   |  Arxiv 2023  |    3.64   |           -          |   18.05   |    0.00   |    48.45   |   22.63   |    0.00   |    0.00   |    0.00   |    0.00   |     4.35     |    0.87   |
 |         UniAD-Base         |   ST  |    IL   |   CVPR 2023  |    0.73   |           -          |   45.81   |   16.36   |   129.21   |   43.58   |   14.10   |   17.78   |   21.67   |   10.00   |     14.21    |   15.55   |
 |             VAD            |   ST  |    IL   |   ICCV 2023  |    0.91   |           -          |   42.35   |   15.00   |   157.94   |   46.01   |    8.11   |   24.44   |   18.64   |   20.00   |     19.15    |   18.07   |
