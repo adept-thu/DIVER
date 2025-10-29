@@ -1,5 +1,13 @@
 # Quick Start
 
+### Getting started from Bench2Drive environment preparation
+[Bench2Drive](https://github.com/Thinklab-SJTU/Bench2Drive)
+
+### Download DIVER code for Bench2Drive
+```bash
+git clone https://github.com/adept-thu/DIVER.git
+```
+
 ### Set up a new virtual environment
 ```bash
 conda create -n b2d_zoo python=3.8
@@ -19,7 +27,7 @@ pip install -v -e .
 
 ### install carla
 ```bash
-cd close_loop/Bench2Drive/Bench2DriveZoo
+cd Bench2Drive/Bench2DriveZoo
 mkdir carla
 cd carla
 wget https://carla-releases.s3.us-east-005.backblazeb2.com/Linux/CARLA_0.9.15.tar.gz
@@ -39,18 +47,24 @@ cd Bench2DriveZoo/mmcv/datasets
 python prepare_B2D.py --workers 16   # workers used to prepare data
 ```
 
-####  train MomAD 
+####  train DIVER 
 ```
-./adzoo/vad/dist_train.sh ./adzoo/vad/configs/VAD/MomAD_base_e2e_b2d.py  1
-# or
-./adzoo/sparsedrive/dist_train.sh ./adzoo/sparsedrive/configs/sparsedrive_small_b2d_stage2.py 1
+bash ./adzoo/sparsedrive/tools/dist_train.sh \
+   ./adzoo/sparsedrive/configs/DIVER_small_b2d_stage2_targetpoint_multiplan.py \
+   8 \
+   --deterministic
 ```
 
-####  test MomAD （Open_loop in Bench2Drive）
+####  test DIVER （Open_loop in Bench2Drive）
 ```
-./adzoo/vad/dist_test.sh ./adzoo/vad/configs/VAD/VAD_base_e2e_b2d.py 1
+bash ./adzoo/sparsedrive/tools/dist_test.sh \
+    projects/configs/DIVER_small_b2d_stage2_targetpoint_multiplan.py \
+    work_dirs/DIVER_small_b2d_stage2_targetpoint_multiplan/iter_156512.pth\
+    1 \
+    --deterministic \
+    --eval bbox
 ```
-####  test MomAD (Close_loop in Carla)
+####  test DIVER (Close_loop in Carla)
 ```
 bash leaderboard/scripts/run_evaluation_multi_vad.sh
 ```
