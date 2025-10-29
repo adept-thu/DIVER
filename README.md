@@ -21,7 +21,8 @@ Existing end-to-end autonomous driving (E2E-AD) methods predominantly rely on si
 
 <div align="justify">
 :fire: Contributions:
-* **DIVER Concept.**  We propose the DIVER, an novel multi-mode E2E-AD framework that uses reinforcement learning to guide diffusion models in generating diverse and feasible driving behaviors.
+  
+* **DIVER Concept.** We propose the DIVER, an novel multi-mode E2E-AD framework that uses reinforcement learning to guide diffusion models in generating diverse and feasible driving behaviors.
 
 * **Diffusion Model.** We introduce the Policy-Aware Diffusion Generator (PADG), which incorporates map elements and agent interactions as conditional inputs, enabling the generation of multi-mode trajectory that capture diverse driving styles.
 
