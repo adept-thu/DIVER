@@ -95,7 +95,7 @@ SparseDrive |0.05| 0.11| 0.23| 0.13| **0.01**| 0.05| 0.18| 0.08|
 ## Quick Start
 [Quick Start for Open_loop](https://github.com/adept-thu/DIVER/blob/main/docs/nus_quick_start.md)
 
-[Quick start for Close_loop](https://github.com/adept-thu/DIVER/blob/main/docs/bench2drive_quick_start.md)
+[Quick start for Close_loop](https://github.com/adept-thu/DIVER/blob/main/docs/b2d_quick_start.md)
 
 ## Citation
 If you find DIVER is useful in your research or applications, please consider giving us a star 🌟 and citing it by the following BibTeX entry.
