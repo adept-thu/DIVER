@@ -56,6 +56,7 @@ bash ./adzoo/sparsedrive/tools/dist_train.sh \
 ```
 
 ####  test DIVER （Open_loop in Bench2Drive）
+diver_nus.pth:[diver_nus weights](https://huggingface.co/ZI-YING/DIVER_Bench2Drive/blob/main/iter_156512.pth)
 ```
 bash ./adzoo/sparsedrive/tools/dist_test.sh \
     projects/configs/DIVER_small_b2d_stage2_targetpoint_multiplan.py \
