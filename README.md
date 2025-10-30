@@ -9,7 +9,7 @@ This is the official repository of [**DIVER**](https://arxiv.org/abs/2503.03125)
 </div>
 
 <div align="center">
-  <img src="https://github.com/adept-thu/DIVER/Vis_navsim.png" />
+  <img src="https://github.com/adept-thu/DIVER/blob/main/Vis_navsim.png" />
 </div>
 
 ## Abstract
@@ -40,7 +40,7 @@ Existing end-to-end autonomous driving (E2E-AD) methods predominantly rely on si
 <center>
     <img style="border-radius: 0.3125em;
     box-shadow: 0 2px 4px 0 rgba(34,36,38,.12),0 2px 10px 0 rgba(34,36,38,.08);" 
-    src="https://github.com/adept-thu/DIVER/DIVER_framework.png" width="1000">
+    src="https://github.com/adept-thu/DIVER/blob/main/DIVER_framework.png" width="1000">
     <br>
     <div style="color:orange; border-bottom: 1px solid #d9d9d9;
     display: inline-block;
