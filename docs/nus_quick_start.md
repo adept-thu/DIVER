@@ -76,7 +76,7 @@ bash ./tools/dist_train.sh \
 ```
 
 ####  test diver
-diver_nus.pth:[diver_nus weights]([https://huggingface.co/ZI-YING/DIVER_NuScenes/blob/main/iter_11720.pth])
+diver_nus.pth:[diver_nus weights](https://huggingface.co/ZI-YING/DIVER_NuScenes/blob/main/iter_11720.pth)
 ```
 bash ./tools/dist_test.sh \
     projects/configs/diver_small_stage2_roboAD.py \
