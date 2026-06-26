@@ -4,7 +4,7 @@
 
 This is the official repository of [**DIVER**](https://arxiv.org/abs/2507.04049). 
 
-
+:fire: Our work has been accepted by TAPMI 2026!
 
 </div>
 
